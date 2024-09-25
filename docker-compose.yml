@@ -1,0 +1,55 @@
+version: '1'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:14.5-alpine
+    environment:
+      POSTGRES_USER: mayur
+      POSTGRES_PASSWORD: mayur123
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - es-net
+
+  init:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    depends_on:
+      - elasticsearch
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["/init-commands.sh"]
+    volumes:
+      - ./elasticsearch/init-commands.sh:/init-commands.sh  # Mount the commands file
+    networks:
+      - es-net
+
+networks:
+  es-net:
+    driver: bridge
+  postgres:
+    driver: bridge

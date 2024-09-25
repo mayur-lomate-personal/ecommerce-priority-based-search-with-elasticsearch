@@ -1,0 +1,23 @@
+##https://medium.com/quantyca/reviving-an-e-commerce-search-engine-using-elasticsearch-e540751c6d99
+
+server:
+  port: 8081
+spring:
+  application:
+    name: ecommerce
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  datasource:
+    username: 'mayur'
+    url: jdbc:postgresql://localhost:5432/ecommerce
+    password: 'mayur123'
+  data:
+    elasticsearch:
+      rest:
+        uris: http://localhost:9200
